@@ -1,0 +1,80 @@
+import { useEffect, useRef } from 'react'
+import Lenis from 'lenis'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+import SceneCanvas     from './components/canvas/SceneCanvas'
+import LoadingScreen   from './components/ui/LoadingScreen'
+import HUD             from './components/ui/HUD'
+import ScrollIndicator from './components/ui/ScrollIndicator'
+import PortfolioSection from './components/ui/PortfolioSection'
+import ContactSection  from './components/ui/ContactSection'
+
+import useScrollStore from './stores/useScrollStore'
+
+gsap.registerPlugin(ScrollTrigger)
+
+export default function App() {
+  const scrollDriverRef = useRef(null)
+
+  useEffect(() => {
+    // ── Lenis smooth scroll ────────────────────────────────────────────────────
+    const lenis = new Lenis({
+      duration: 1.8,
+      easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      syncTouch: false,
+    })
+
+    // Connect Lenis → GSAP ticker (canonical integration pattern)
+    lenis.on('scroll', ScrollTrigger.update)
+
+    gsap.ticker.add(time => {
+      lenis.raf(time * 1000)
+    })
+    gsap.ticker.lagSmoothing(0)
+
+    // ── GSAP ScrollTrigger → Zustand scroll store ──────────────────────────────
+    // Wait one tick so the DOM is ready
+    const st = ScrollTrigger.create({
+      trigger: scrollDriverRef.current,
+      start:   'top top',
+      end:     'bottom bottom',
+      scrub:   true,
+      onUpdate: self => {
+        useScrollStore.getState().setScrollProgress(self.progress)
+      },
+    })
+
+    return () => {
+      st.kill()
+      lenis.destroy()
+      gsap.ticker.remove()
+    }
+  }, [])
+
+  return (
+    <>
+      {/* ── Fixed 3D canvas (behind everything) ─────────────────────────────── */}
+      <div id="canvas-wrapper">
+        <SceneCanvas />
+      </div>
+
+      {/* ── Invisible scroll driver — provides scroll height ─────────────────── */}
+      <div id="scroll-driver" ref={scrollDriverRef} aria-hidden="true" />
+
+      {/* ── UI overlay — non-interactive by default (pointer-events:none) ────── */}
+      <div id="ui-overlay">
+        <HUD />
+        <ScrollIndicator />
+        <PortfolioSection />
+        <ContactSection />
+      </div>
+
+      {/* ── Loading screen — renders on top, fades away ───────────────────────── */}
+      <LoadingScreen />
+    </>
+  )
+}

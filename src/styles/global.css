@@ -1,0 +1,102 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-void: #000005;
+  --color-deep-space: #050510;
+  --color-nebula-blue: #0a1628;
+  --color-star: #e8f0ff;
+  --color-accent: #4488ff;
+  --color-glow: #88aaff;
+  --color-warm: #ff8c44;
+  --color-gold: #ffcc44;
+  --font-display: 'Orbitron', monospace;
+  --font-body: 'Space Grotesk', sans-serif;
+}
+
+html {
+  background: var(--color-void);
+  overflow-x: hidden;
+}
+
+body {
+  background: var(--color-void);
+  color: var(--color-star);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hide scrollbar but keep functionality */
+::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
+/* Canvas wrapper — fixed, full viewport */
+#canvas-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Scroll driver — invisible, provides scroll height */
+#scroll-driver {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+  height: 700vh;
+}
+
+/* UI overlay — fixed, above canvas, non-blocking by default */
+#ui-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Utility classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Cinematic letter-spacing for display text */
+.display-text {
+  font-family: var(--font-display);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* Glow text effect */
+.glow {
+  text-shadow:
+    0 0 20px rgba(68, 136, 255, 0.8),
+    0 0 40px rgba(68, 136, 255, 0.4),
+    0 0 80px rgba(68, 136, 255, 0.2);
+}
+
+/* Subtle fade animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+@keyframes scanline {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
