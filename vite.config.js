@@ -2,6 +2,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
+  // GitHub Pages serves from /Website/ subdirectory
+  base: process.env.GITHUB_ACTIONS ? '/Website/' : '/',
   plugins: [react()],
   optimizeDeps: {
     exclude: ['@react-three/fiber', '@react-three/drei', '@react-three/postprocessing'],
