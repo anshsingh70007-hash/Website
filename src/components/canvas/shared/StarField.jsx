@@ -4,7 +4,8 @@ import * as THREE from 'three'
 import { particleVertexShader, particleFragmentShader } from '../../../shaders/particleShader'
 import useScrollStore from '../../../stores/useScrollStore'
 
-const STAR_COUNT = 12000
+const isMobile  = /Android|iPhone|iPad/i.test(navigator.userAgent)
+const STAR_COUNT = isMobile ? 5000 : 12000
 
 export default function StarField() {
   const meshRef   = useRef()

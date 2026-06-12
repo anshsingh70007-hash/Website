@@ -19,13 +19,17 @@ export default function App() {
 
   useEffect(() => {
     // ── Lenis smooth scroll ────────────────────────────────────────────────────
+    const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent)
+
     const lenis = new Lenis({
-      duration: 1.8,
+      duration: isMobile ? 1.2 : 1.8,
       easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      syncTouch: false,
+      // On touch devices, let Lenis handle native touch scroll
+      syncTouch: isMobile,
+      touchMultiplier: isMobile ? 2.5 : 1,
     })
 
     // Connect Lenis → GSAP ticker (canonical integration pattern)

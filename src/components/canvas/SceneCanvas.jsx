@@ -13,14 +13,15 @@ import BlackHoleScene  from './scenes/BlackHoleScene'
 import EventHorizonScene from './scenes/EventHorizonScene'
 import FutureStation   from './scenes/FutureStation'
 
-// Minimal loading fallback — the CSS LoadingScreen handles the visual part
 function SceneFallback() { return null }
+
+const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent)
 
 export default function SceneCanvas() {
   return (
     <Canvas
       gl={{
-        antialias: true,
+        antialias: !isMobile,   // MSAA is expensive on mobile GPUs — skip it
         toneMapping: THREE.ACESFilmicToneMapping,
         toneMappingExposure: 1.1,
         outputColorSpace: THREE.SRGBColorSpace,
@@ -32,7 +33,8 @@ export default function SceneCanvas() {
         far: 2000,
         position: [0, 2, 10],
       }}
-      dpr={[1, Math.min(2, window.devicePixelRatio)]}
+      // Cap at 1.5× on mobile — retina at 3× is a GPU killer
+      dpr={isMobile ? [1, 1.5] : [1, Math.min(2, window.devicePixelRatio)]}
       frameloop="always"
       style={{ background: '#000005' }}
     >
