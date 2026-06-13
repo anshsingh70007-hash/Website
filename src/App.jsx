@@ -3,12 +3,13 @@ import Lenis from 'lenis'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-import SceneCanvas     from './components/canvas/SceneCanvas'
-import LoadingScreen   from './components/ui/LoadingScreen'
-import HUD             from './components/ui/HUD'
-import ScrollIndicator from './components/ui/ScrollIndicator'
+import SceneCanvas      from './components/canvas/SceneCanvas'
+import LoadingScreen    from './components/ui/LoadingScreen'
+import HUD              from './components/ui/HUD'
+import ScrollIndicator  from './components/ui/ScrollIndicator'
 import PortfolioSection from './components/ui/PortfolioSection'
-import ContactSection  from './components/ui/ContactSection'
+import ContactSection   from './components/ui/ContactSection'
+import ErrorBoundary    from './components/ErrorBoundary'
 
 import useScrollStore from './stores/useScrollStore'
 
@@ -35,13 +36,10 @@ export default function App() {
     // Connect Lenis → GSAP ticker (canonical integration pattern)
     lenis.on('scroll', ScrollTrigger.update)
 
-    gsap.ticker.add(time => {
-      lenis.raf(time * 1000)
-    })
+    const lenisRaf = time => lenis.raf(time * 1000)
+    gsap.ticker.add(lenisRaf)
     gsap.ticker.lagSmoothing(0)
 
-    // ── GSAP ScrollTrigger → Zustand scroll store ──────────────────────────────
-    // Wait one tick so the DOM is ready
     const st = ScrollTrigger.create({
       trigger: scrollDriverRef.current,
       start:   'top top',
@@ -55,7 +53,7 @@ export default function App() {
     return () => {
       st.kill()
       lenis.destroy()
-      gsap.ticker.remove()
+      gsap.ticker.remove(lenisRaf)
     }
   }, [])
 
@@ -63,7 +61,9 @@ export default function App() {
     <>
       {/* ── Fixed 3D canvas (behind everything) ─────────────────────────────── */}
       <div id="canvas-wrapper">
-        <SceneCanvas />
+        <ErrorBoundary>
+          <SceneCanvas />
+        </ErrorBoundary>
       </div>
 
       {/* ── Invisible scroll driver — provides scroll height ─────────────────── */}
